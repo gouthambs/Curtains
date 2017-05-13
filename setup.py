@@ -42,6 +42,11 @@ setup(
     platforms='win',
     install_requires=get_requirements(),
     tests_require=[],
+    entry_points={
+        'console_scripts': [
+            'curt = curtains.main:main',
+        ]
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

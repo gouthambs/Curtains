@@ -1,5 +1,6 @@
 env = {
     'username': None,
     'password': None,
-    'hosts': None
+    'hosts': None,
+    "curtfile": "curtfile"
 }
