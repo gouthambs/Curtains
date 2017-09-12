@@ -2,9 +2,10 @@ import os
 import click
 import inspect
 from functools import wraps
-from curtains.commands import Command
+from curtains.operations import Operation
 from curtains.osspecific import win_command_loop
 from curtains import state
+import logging
 
 
 @click.group(chain=True)
@@ -28,9 +29,9 @@ def cmd_loop(commands, env):
 def executor(fn, env):
     @wraps(fn)
     def decorated(*args, **kwargs):
-        Command.clear_commands()
+        Operation.clear_commands()
         fn(*args, **kwargs)
-        cmd_loop(Command.commands(), env)
+        cmd_loop(Operation.commands(), env)
     return decorated
 
 
@@ -92,6 +93,7 @@ def find_curtfile(names=None):
 
 
 def main(curtfile_locations=None):
+    logging.basicConfig(level=logging.INFO)
     curtfile = find_curtfile(curtfile_locations)
     print(curtfile)
     exec(open(curtfile).read())
@@ -100,4 +102,5 @@ def main(curtfile_locations=None):
 
 
 if __name__ == '__main__':
-    main(os.path.join(os.getcwd(), "curtfile.py"))
+
+    main()

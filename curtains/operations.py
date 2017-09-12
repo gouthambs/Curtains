@@ -2,7 +2,7 @@
 __all__ = ['run', 'local']
 
 
-class Command(object):
+class Operation(object):
     _cmd = []
 
     @classmethod
@@ -14,17 +14,17 @@ class Command(object):
         return cls._cmd
 
 
-class Run(Command):
+class Run(Operation):
     def __call__(self, cmd):
-        self._cmd.append({'cmd': cmd, 'type': 'batch', 'class': 'Run'})
+        self._cmd.append({'cmd': cmd, 'remote': True, 'class': 'Run'})
 
 
-class Local(Command):
+class Local(Operation):
     def __call__(self, cmd):
-        self._cmd.append({'cmd':cmd, 'type': 'batch', 'class': 'Local'})
+        self._cmd.append({'cmd':cmd, 'remote': False, 'class': 'Local'})
 
 
-def XCopy(Command):
+class XCopy(Operation):
     def __call__(self, localpath, remotepath):
         pass
 

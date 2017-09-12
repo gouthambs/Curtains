@@ -1,5 +1,5 @@
 from functools import wraps
-from curtains.commands import Command
+from curtains.operations import Operation
 
 class task(object):
     _task_list = []

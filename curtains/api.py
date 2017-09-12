@@ -1,5 +1,5 @@
 from curtains.state import env
 from curtains.decorator import task
-from curtains.commands import local, run
+from curtains.operations import local, run
 
 
