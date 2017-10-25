@@ -9,9 +9,21 @@ import logging
 
 
 @click.group(chain=True)
+@click.option("--debug/--no-debug", help="Run with debug level of error messages", default=False)
+@click.option("--username", "-u",help="Override the username", default=None)
+@click.option("--password", "-p",help="Override the password", default=None)
 @click.pass_context
-def cli(ctx):
-    pass
+def cli(ctx, debug, username, password):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    curtfile = find_curtfile(None)
+    print(curtfile)
+    exec(open(curtfile).read())
+    ctx.obj['USERNAME'] = username
+    ctx.obj['PASSWORD'] = password
+    cli = create_cli(ctx)
 
 
 @cli.resultcallback()
@@ -35,14 +47,18 @@ def executor(fn, env):
     return decorated
 
 
-def create_cli():
+def create_cli(ctx):
     from curtains.decorator import task
     task_list = task.task_list()
     #task_fn = [t['fn'], t) for t in task_list]
     for task in task_list:
+        task['username'] = ctx.obj['USERNAME'] or task['username'] 
+        task['password'] = ctx.obj['PASSWORD'] or task['password'] 
         t = task.pop('fn')
         argnames = [str(a) for a in inspect.signature(t).parameters.keys()]
         fn = executor(t, task)
+        
+        #click.option("--password
         for arg in argnames[::-1]:
             click.argument(arg)(fn)
         cli.command()(fn)
@@ -91,7 +107,7 @@ def find_curtfile(names=None):
                         return os.path.abspath(joined)
             path = os.path.join('..', path)
 
-
+"""
 def main(curtfile_locations=None):
     logging.basicConfig(level=logging.INFO)
     curtfile = find_curtfile(curtfile_locations)
@@ -99,8 +115,8 @@ def main(curtfile_locations=None):
     exec(open(curtfile).read())
     cli = create_cli()
     cli()
-
+"""
 
 if __name__ == '__main__':
 
-    main()
+    cli(obj={})

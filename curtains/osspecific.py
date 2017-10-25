@@ -53,6 +53,8 @@ def win_command_loop(commands, username=None, password=None, hosts=None):
                 invoke_cmd = win_invoke_command(cmpt_name, cmd_list)
                 cmd = auth_cmd + invoke_cmd
                 _logger.info("Executing on machine %s" % cmpt_name)
+                for c in cmd:
+                    _logger.debug(c)
                 proc = subprocess.Popen(["powershell.exe", "-ExecutionPolicy",
                                          'RemoteSigned', "-Command",
                                          ";".join(cmd)
@@ -73,7 +75,7 @@ def win_command_loop(commands, username=None, password=None, hosts=None):
 
 def win_invoke_command(computer_name, remote_commands):
     remote_script = ' "&" '.join(remote_commands)
-    cmd = ['Invoke-Command -computername %s -credential $cred -ScriptBlock { & cmd.exe /c %s }' % \
+    cmd = ['Invoke-Command -computername %s -Credential $cred -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
     #cmd = ['Invoke-Command -computername %s -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
     return cmd
 
@@ -93,6 +95,8 @@ def win_get_credential(username=None, password=None):
 
     cmd = []
     if need_auth:
-        cmd = ['$passwd=convertto-securestring -AsPlainText -Force -String "%s"' % password,
-               '$cred=new-object -typename System.Management.Automation.PSCredential -argumentlist "%s", $passwd' % username]
-    return []
+        cmd = ["$username='%s'" % username,
+                "$password='%s'"% password,
+                '$securepassword=convertto-securestring $password -AsPlainText -Force ',
+               '$cred=new-object System.Management.Automation.PSCredential $username, $securepassword']
+    return cmd
