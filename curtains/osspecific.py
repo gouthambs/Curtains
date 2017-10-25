@@ -73,8 +73,8 @@ def win_command_loop(commands, username=None, password=None, hosts=None):
 
 def win_invoke_command(computer_name, remote_commands):
     remote_script = ' "&" '.join(remote_commands)
-    #cmd = ['Invoke-Command -computername %s -credential $cred -ScriptBlock { & cmd.exe /c %s }' % \
-    cmd = ['Invoke-Command -computername %s -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
+    cmd = ['Invoke-Command -computername %s -credential $cred -ScriptBlock { & cmd.exe /c %s }' % \
+    #cmd = ['Invoke-Command -computername %s -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
     return cmd
 
 def win_local(remote_commands):
