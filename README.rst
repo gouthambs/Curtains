@@ -24,10 +24,11 @@ Quickstart
 .. code:: python
 
     # curtfile.py
-    from curtains.api import task, run
+    from curtains.api import task
 
     @task()
     def hello_world():
+        from curtains.api import local, run
         local("echo Hello World!")
 
 

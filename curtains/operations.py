@@ -24,10 +24,12 @@ class Local(Operation):
         self._cmd.append({'cmd':cmd, 'remote': False, 'class': 'Local'})
 
 
-class XCopy(Operation):
+class Put(Operation):
     def __call__(self, localpath, remotepath):
-        pass
+        cmd = ""
+        self._cmd.append({'cmd': cmd, 'remote': False, 'class': 'Put'})
 
 
 run = Run()
 local = Local()
+put = Put()

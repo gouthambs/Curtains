@@ -12,13 +12,14 @@ import logging
 @click.option("--debug/--no-debug", help="Run with debug level of error messages", default=False)
 @click.option("--username", "-u",help="Override the username", default=None)
 @click.option("--password", "-p",help="Override the password", default=None)
+@click.option("--curtfile", "-c", help="Curtfile path", default=None)
 @click.pass_context
-def cli(ctx, debug, username, password):
+def cli(ctx, debug, username, password, curtfile):
     if debug:
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-    curtfile = find_curtfile(None)
+    curtfile = find_curtfile(curtfile)
     print(curtfile)
     exec(open(curtfile).read())
     ctx.obj['USERNAME'] = username
@@ -107,16 +108,9 @@ def find_curtfile(names=None):
                         return os.path.abspath(joined)
             path = os.path.join('..', path)
 
-"""
 def main(curtfile_locations=None):
-    logging.basicConfig(level=logging.INFO)
-    curtfile = find_curtfile(curtfile_locations)
-    print(curtfile)
-    exec(open(curtfile).read())
-    cli = create_cli()
-    cli()
-"""
+    cli(obj={})
+
 
 if __name__ == '__main__':
-
-    cli(obj={})
+    main()

@@ -44,13 +44,13 @@ def win_command_loop(commands, username=None, password=None, hosts=None):
     hosts = hosts or env.get("hosts")
     command_batches = win_make_commands(commands)
 
-    auth_cmd = win_get_credential(username, password)
+    auth_cmd, need_auth = win_get_credential(username, password)
     for cmd_list, remote in command_batches:
         if remote:
             processes = []
             for cmpt_name in hosts:
                 # cmpt_name = % i
-                invoke_cmd = win_invoke_command(cmpt_name, cmd_list)
+                invoke_cmd = win_invoke_command(cmpt_name, cmd_list, need_auth)
                 cmd = auth_cmd + invoke_cmd
                 _logger.info("Executing on machine %s" % cmpt_name)
                 for c in cmd:
@@ -73,15 +73,18 @@ def win_command_loop(commands, username=None, password=None, hosts=None):
             #proc.communicate()
 
 
-def win_invoke_command(computer_name, remote_commands):
+def win_invoke_command(computer_name, remote_commands, need_auth):
     remote_script = ' "&" '.join(remote_commands)
-    cmd = ['Invoke-Command -computername %s -Credential $cred -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
-    #cmd = ['Invoke-Command -computername %s -ScriptBlock { & cmd.exe /c %s }' % (computer_name, remote_script)]
+    if need_auth:
+        cmd = ['Invoke-Command -computername %s -Credential $cred -ScriptBlock { & cmd.exe /c %s }' % (
+            computer_name, remote_script)]
+    else:
+        cmd = ['Invoke-Command -computername %s -ScriptBlock { & cmd.exe /c %s }' % (
+            computer_name, remote_script)]
     return cmd
 
 def win_local(remote_commands):
     remote_script = ' "&" '.join(remote_commands)
-    #cmd = "cmd.exe /c %s" % remote_script
     return remote_script
 
 
@@ -90,6 +93,7 @@ def win_get_credential(username=None, password=None):
     username = username or current_user
     stripped_user = username.split("\\")[-1]
     need_auth = stripped_user != current_user
+    _logger.debug("The current user is %s (%s), with username %s" % (current_user, stripped_user, username))
     if (password is None) and need_auth:
         password = getpass.getpass("Provide password for %s: " % username)
 
@@ -99,4 +103,4 @@ def win_get_credential(username=None, password=None):
                 "$password='%s'"% password,
                 '$securepassword=convertto-securestring $password -AsPlainText -Force ',
                '$cred=new-object System.Management.Automation.PSCredential $username, $securepassword']
-    return cmd
+    return cmd, need_auth
