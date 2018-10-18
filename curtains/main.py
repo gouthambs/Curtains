@@ -12,7 +12,7 @@ import logging
 @click.option("--debug/--no-debug", help="Run with debug level of error messages", default=False)
 @click.option("--username", "-u",help="Override the username", default=None)
 @click.option("--password", "-p",help="Override the password", default=None)
-@click.option("--curtfile", "-c", help="Curtfile path", default=None)
+@click.option("--curtfile", "-c", help="Curtfile path", default=None, multiple=True)
 @click.pass_context
 def cli(ctx, debug, username, password, curtfile):
     if debug:
